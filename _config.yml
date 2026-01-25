@@ -1,0 +1,7 @@
+title: "Weather"
+description: "Prakiraan Cuaca Modern Real-time"
+baseurl: "/weather"
+url: "https://ishikawauta.github.io"
+
+plugins:
+  - jekyll-feed

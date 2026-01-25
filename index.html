@@ -1,0 +1,58 @@
+---
+layout: default
+title: Prakiraan Cuaca Real-time
+---
+
+<div class="weather-card">
+    <div class="search-box">
+        <button id="location-btn" title="Gunakan Lokasi Saat Ini">
+            <i class="fas fa-location-dot"></i>
+        </button>
+        <input type="text" id="city-input" placeholder="Cari nama kota...">
+        <button id="search-btn"><i class="fas fa-search"></i></button>
+    </div>
+
+    <div id="error-msg" class="error-box hidden">
+        <i class="fas fa-circle-exclamation"></i> Kota tidak ditemukan!
+    </div>
+
+    <div class="weather-content hidden" id="weather-data">
+        <div class="location-date">
+            <h2 id="city-name">--</h2>
+            <p id="date">--</p>
+        </div>
+
+        <div class="current-weather">
+            <div class="temp-wrapper">
+                <span id="temp">0</span>°C
+            </div>
+            <div class="main-icon">
+                <img id="weather-icon" src="" alt="Icon">
+                <p id="description">Sedang memuat...</p>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-item">
+                <i class="fas fa-wind"></i>
+                <div>
+                    <p id="wind">0 km/h</p>
+                    <span>Angin</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-droplet"></i>
+                <div>
+                    <p id="humidity">0%</p>
+                    <span>Kelembaban</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <h3 class="forecast-title">Prakiraan 5 Hari ke Depan</h3>
+        <div id="forecast-container" class="forecast-grid">
+            </div>
+    </div>
+</div>
