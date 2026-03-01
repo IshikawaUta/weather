@@ -1,25 +1,45 @@
 ---
 permalink: /404.html
-layout: page
+layout: default
+title: Halaman Tidak Ditemukan
 ---
 
-<style type="text/css" media="screen">
-  .container {
-    margin: 10px auto;
-    max-width: 600px;
-    text-align: center;
-  }
-  h1 {
-    margin: 30px 0;
-    font-size: 4em;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-</style>
+<div class="weather-card">
+    <div class="error-content">
+        <h1 style="font-size: 6rem; margin-bottom: 10px; opacity: 0.8;">404</h1>
+        <i class="fas fa-cloud-moon-rain" style="font-size: 80px; margin-bottom: 20px; display: block;"></i>
+        
+        <h2 style="margin-bottom: 15px;">Waduh! Halaman Hilang</h2>
+        <p style="opacity: 0.9; margin-bottom: 30px;">
+            Sepertinya halaman yang Anda cari tertutup kabut atau tidak ada di radar kami.
+        </p>
 
-<div class="container">
-  <h1>404</h1>
-
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
+        <a href="{{ site.baseurl }}/" class="btn-home" style="
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: 0.3s;
+        ">
+            <i class="fas fa-home"></i> Kembali ke Beranda
+        </a>
+    </div>
 </div>
+
+<style>
+    .btn-home:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+    .error-content {
+        padding: 40px 20px;
+        animation: fadeIn 0.8s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>

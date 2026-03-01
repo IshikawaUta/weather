@@ -2,6 +2,7 @@ const apiKey = "2e828d6cfd738df2af2f9511ef50f06c";
 const weatherUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&lang=id";
 const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?units=metric&lang=id";
 
+// Seleksi Elemen DOM
 const cityInput = document.getElementById("city-input");
 const searchBtn = document.getElementById("search-btn");
 const locationBtn = document.getElementById("location-btn");
@@ -9,24 +10,25 @@ const loader = document.getElementById("loader");
 const errorBox = document.getElementById("error-msg");
 const weatherContent = document.getElementById("weather-data");
 
-// 1. Fungsi Utama Ambil Cuaca (Nama Kota)
+// 1. Fungsi Utama Ambil Cuaca (Berdasarkan Nama Kota)
 async function checkWeather(city) {
+    if (!city) return;
     showLoader();
     try {
         const response = await fetch(`${weatherUrl}&q=${city}&appid=${apiKey}`);
         if (response.status == 404) {
-            showError();
+            showError("Kota tidak ditemukan!");
         } else {
             const data = await response.json();
             updateUI(data);
             getForecast(city);
         }
     } catch (err) {
-        showError();
+        showError("Gagal memuat data. Periksa koneksi internet Anda.");
     }
 }
 
-// 2. Fungsi Ambil Cuaca (Koordinat GPS)
+// 2. Fungsi Ambil Cuaca (Berdasarkan Koordinat GPS)
 async function checkWeatherByCoords(lat, lon) {
     showLoader();
     try {
@@ -35,7 +37,7 @@ async function checkWeatherByCoords(lat, lon) {
         updateUI(data);
         getForecast(data.name);
     } catch (err) {
-        showError();
+        showError("Gagal mendeteksi lokasi.");
     }
 }
 
@@ -45,8 +47,10 @@ async function getForecast(city) {
         const response = await fetch(`${forecastUrl}&q=${city}&appid=${apiKey}`);
         const data = await response.json();
         const container = document.getElementById("forecast-container");
+        
+        if (!container) return; // Keamanan jika elemen tidak ada di halaman (seperti 404)
+        
         container.innerHTML = "";
-
         // Ambil data setiap interval 24 jam (indeks 7, 15, 23, 31, 39)
         for (let i = 7; i < data.list.length; i += 8) {
             const dayData = data.list[i];
@@ -56,36 +60,50 @@ async function getForecast(city) {
             container.innerHTML += `
                 <div class="forecast-item">
                     <p>${dayName}</p>
-                    <img src="https://openweathermap.org/img/wn/${dayData.weather[0].icon}.png">
+                    <img src="https://openweathermap.org/img/wn/${dayData.weather[0].icon}.png" alt="icon">
                     <p><strong>${Math.round(dayData.main.temp)}°</strong></p>
                 </div>
             `;
         }
-    } catch (err) { console.error("Forecast Error:", err); }
+    } catch (err) { 
+        console.error("Forecast Error:", err); 
+    }
 }
 
-// 4. Update Tampilan UI
+// 4. Update Tampilan UI Utama
 function updateUI(data) {
-    document.getElementById("city-name").innerText = `${data.name}, ${data.sys.country}`;
-    document.getElementById("temp").innerText = Math.round(data.main.temp);
-    document.getElementById("description").innerText = data.weather[0].description;
-    document.getElementById("humidity").innerText = data.main.humidity + "%";
-    document.getElementById("wind").innerText = data.wind.speed + " km/h";
-    document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+    if (!weatherContent) return;
+
+    const cityNameElem = document.getElementById("city-name");
+    const tempElem = document.getElementById("temp");
+    const descElem = document.getElementById("description");
+    const humidityElem = document.getElementById("humidity");
+    const windElem = document.getElementById("wind");
+    const iconElem = document.getElementById("weather-icon");
+    const dateElem = document.getElementById("date");
+
+    if (cityNameElem) cityNameElem.innerText = `${data.name}, ${data.sys.country}`;
+    if (tempElem) tempElem.innerText = Math.round(data.main.temp);
+    if (descElem) descElem.innerText = data.weather[0].description;
+    if (humidityElem) humidityElem.innerText = data.main.humidity + "%";
+    if (windElem) windElem.innerText = data.wind.speed + " km/h";
+    if (iconElem) iconElem.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
     
     const now = new Date();
-    document.getElementById("date").innerText = now.toLocaleDateString('id-ID', { 
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
-    });
+    if (dateElem) {
+        dateElem.innerText = now.toLocaleDateString('id-ID', { 
+            weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
+        });
+    }
 
     updateTheme(data.weather[0].main);
     
     weatherContent.classList.remove("hidden");
-    errorBox.classList.add("hidden");
+    if (errorBox) errorBox.classList.add("hidden");
     hideLoader();
 }
 
-// 5. Update Background Berdasarkan Cuaca
+// 5. Update Background Berdasarkan Kondisi Cuaca
 function updateTheme(condition) {
     const themes = {
         Clear: "linear-gradient(135deg, #fceabb, #f8b500)",
@@ -105,16 +123,62 @@ function getLocation() {
             (p) => checkWeatherByCoords(p.coords.latitude, p.coords.longitude),
             () => checkWeather("Jakarta")
         );
-    } else { checkWeather("Jakarta"); }
+    } else { 
+        checkWeather("Jakarta"); 
+    }
 }
 
-function showLoader() { loader.style.display = 'flex'; loader.style.opacity = '1'; }
-function hideLoader() { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
-function showError() { errorBox.classList.remove("hidden"); weatherContent.classList.add("hidden"); hideLoader(); }
+function showLoader() { 
+    if (loader) { 
+        loader.style.display = 'flex'; 
+        loader.style.opacity = '1'; 
+    } 
+}
 
-// Event Listeners
-searchBtn.addEventListener("click", () => checkWeather(cityInput.value));
-locationBtn.addEventListener("click", getLocation);
-cityInput.addEventListener("keypress", (e) => { if(e.key === "Enter") checkWeather(cityInput.value); });
+function hideLoader() { 
+    if (loader) { 
+        loader.style.opacity = '0'; 
+        setTimeout(() => loader.style.display = 'none', 500); 
+    } 
+}
 
-window.addEventListener("load", getLocation);
+function showError(message) { 
+    if (errorBox) {
+        errorBox.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${message}`;
+        errorBox.classList.remove("hidden"); 
+    }
+    if (weatherContent) weatherContent.classList.add("hidden"); 
+    hideLoader(); 
+}
+
+// --- LOGIKA PWA & EVENT LISTENERS ---
+
+// Registrasi Service Worker Dinamis
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        // Deteksi base path secara otomatis
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const swPath = isLocal ? '/weather/sw.js' : '/weather/sw.js'; 
+
+        navigator.serviceWorker.register(swPath)
+            .then(reg => console.log('PWA Service Worker terdaftar!', reg.scope))
+            .catch(err => console.warn('PWA Service Worker gagal:', err));
+    });
+}
+
+// Event Listeners dengan pengecekan elemen (Agar tidak error di halaman selain index)
+if (searchBtn && cityInput) {
+    searchBtn.addEventListener("click", () => checkWeather(cityInput.value));
+    cityInput.addEventListener("keypress", (e) => { 
+        if(e.key === "Enter") checkWeather(cityInput.value); 
+    });
+}
+
+if (locationBtn) {
+    locationBtn.addEventListener("click", getLocation);
+}
+
+// Jalankan pencarian otomatis hanya jika elemen weather-data ada (Halaman utama)
+if (weatherContent) {
+    window.addEventListener("load", getLocation);
+}
